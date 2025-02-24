@@ -15,7 +15,7 @@ export interface IUser extends Document {
     resetPasswordExpires: Date
     deleteAccontToken: string,
     deleteAccontExpires: Date
-
+    __v: number
 }
 
 

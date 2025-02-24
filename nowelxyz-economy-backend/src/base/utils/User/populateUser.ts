@@ -1,8 +1,8 @@
 import { Response, NextFunction } from "express";
-import userSchema from "../schemas/user";
-import sessionSchema from "../schemas/session";
-import CustomRequest from "./CustomRequest";
-import CheckCookie from "./CheckCookie";
+import userSchema from "../../schemas/user";
+import sessionSchema from "../../schemas/session";
+import CustomRequest from "../CustomRequest";
+import CheckCookie from "../CheckCookie";
 
 export default async function populateUser(
     req: CustomRequest,
@@ -30,7 +30,7 @@ export default async function populateUser(
         }
 
         req.user = user;
-        
+
         // Update session activity timestamp
         session.lastActive = new Date();
         await session.save();

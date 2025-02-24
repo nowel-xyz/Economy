@@ -1,4 +1,4 @@
-import { Response, Router, Request} from "express";
+import { Response, Router, Request } from "express";
 import User from "../../base/schemas/user"
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
@@ -7,7 +7,7 @@ import session from "../../base/schemas/session";
 import CheckCookie from "../../base/utils/CheckCookie";
 import unique_uuid from "../../base/utils/unique_uuid";
 import MailManger from "../../base/utils/Mail";
-import populateUser from "../../base/utils/populateUser";
+import populateUser from "../../base/utils/User/populateUser";
 
 
 export default class Auth {
@@ -31,7 +31,7 @@ export default class Auth {
         const { email, password } = req.body;
         const Userdata = await User.findOne({ email });
         if (!Userdata) return res.status(400).send({ message: 'Unauthorized' });
-    
+
         const checkPassword = await bcrypt.compare(password, Userdata.password);
         if (!checkPassword) return res.status(400).send({ message: 'Unauthorized' });
 
@@ -52,8 +52,8 @@ export default class Auth {
             text = `A new login attempt was made from a new IP address: ${ip}. If this wasn't you, please change your password immediately.`;
             Userdata.ips.push({ ip, loginTimes: 1, LastLogin: Date.now() });
         }
-    
-        
+
+
         let uid = await unique_uuid(User);
 
 
@@ -83,7 +83,7 @@ export default class Auth {
         });
 
         res.status(200).send({ message: "Login successfully", User: { username: Userdata.username } });
-    
+
 
         new MailManger().sendMail(Userdata.email, subject, text);
     }
@@ -92,7 +92,7 @@ export default class Auth {
         res.clearCookie("sessionToken")
         const cookie = CheckCookie(req)
         const sessiondDB = await session.findOne({ cookie })
-        if(sessiondDB) {
+        if (sessiondDB) {
             sessiondDB.inactive = true;
             await sessiondDB.save();
         }
@@ -102,14 +102,14 @@ export default class Auth {
     private async register(req: Request, res: Response) {
         const { name, lastName, password, email } = req.body;
         if (!name || !lastName || !password || !email) return res.status(400).send({ message: "Bad request" });
-    
+
         const existingUser = await User.findOne({ email });
         if (existingUser) return res.status(400).send({ message: "Email is taken" });
-    
- 
+
+
         let uid = await unique_uuid(User);
 
-    
+
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
@@ -121,10 +121,10 @@ export default class Auth {
             lastName,
             salt,
             password: hashedPassword,
-            ips: [{ip, loginTimes: 0,}],
+            ips: [{ ip, loginTimes: 0, }],
             email,
         }).save();
-    
+
         const userObject = user.toObject();
         delete userObject.salt;
         delete userObject.cookie;

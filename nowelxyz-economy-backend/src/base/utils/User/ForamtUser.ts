@@ -1,8 +1,8 @@
-import User from "../../types/IUser";
+import { IUser } from "../../schemas/user";
 
-export default function FormatUser(user: User): Partial<User> {
+export default function FormatUser(user: IUser): Partial<IUser> {
 
-    const formattedUser: Partial<User> = (user as any).toObject ? (user as any).toObject() : JSON.parse(JSON.stringify(user));
+    const formattedUser: Partial<IUser> = (user as any).toJSON ? (user as any).toJSON() : JSON.parse(JSON.stringify(user));
 
     // Delete sensitive fields
     delete formattedUser.password;

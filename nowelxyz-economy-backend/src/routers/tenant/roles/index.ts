@@ -21,7 +21,17 @@ export default class TenantRoles {
 
 
     private async tenantRoles(req: CustomRequest, res: Response) {
-      
+        const { tenantuid } = req.params;
+        if (!tenantuid) {
+            return res.status(400).json({ message: "Missing required fields" });
+        }
+
+        try {
+            const roles = await TenantRoleDB.find({ tenantid: tenantuid });
+            res.status(200).json({ roles });
+        } catch (error) {
+            res.status(500).json({ message: "Error fetching roles", error });
+        }
     }
 
     private async newTenantRoles(req: CustomRequest, res: Response) {

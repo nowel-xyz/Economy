@@ -1,6 +1,5 @@
 import { Response, Router } from "express";
 import CustomRequest from "../../base/utils/CustomRequest";
-import IUser from "../../base/types/IUser";
 import ForamtUser from "../../base/utils/User/ForamtUser";
 
 export default class User {
@@ -20,7 +19,7 @@ export default class User {
             return res.status(404).send({ message: "Unauthorized" });
         }
         const user = ForamtUser(req.user);
-        return res.status(200).send(user);
+        return res.status(200).send({ message: `${user.name} ${user.lastName} user data`, data: user });
     }
 
     public build() {
