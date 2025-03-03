@@ -31,7 +31,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
   return (
     <UserContext.Provider value={{ user, userloading }}>
-      {children}
+      {userloading ? <div>init user data</div> : children}
     </UserContext.Provider>
   );
 }

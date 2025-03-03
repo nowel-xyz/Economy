@@ -6,7 +6,6 @@ export default function FormatUser(user: IUser): Partial<IUser> {
 
     // Delete sensitive fields
     delete formattedUser.password;
-    delete formattedUser.sessions;
     delete formattedUser.salt;
     delete formattedUser.ips;
     delete formattedUser.resetPasswordExpires;

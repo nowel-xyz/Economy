@@ -16,7 +16,7 @@ export default class Tenant {
 
     private initializeRouters() {
         this.router.post("/", this.newTenant)
-        this.router.get("/", this.getTenants)
+        this.router.get("/", this.getTenant)
         this.router.use("/members", new TenantMembers().build())
         this.router.use("/roles", new TenantRoles().build())
     }
@@ -47,23 +47,29 @@ export default class Tenant {
         }
     }
 
-    private async getTenants(req: CustomRequest, res: Response) {
+    private async getTenant(req: CustomRequest, res: Response) {
+        const { uid } = req.query;
+        if (!uid) {
+            return res.status(400).send({ message: "missing required inputs" });
+        }
+
         try {
-            const tenants = await Tenantdb.find({
-                $or: [
-                    { ownerid: req.user?.uid },
-                    { members: { $in: [req.user?.uid] } }
-                ]
+            const tenant = await Tenantdb.findOne({ $and: 
+                [
+                    { uid }, 
+                    { members: { $elemMatch: { uid: req.user?.uid }}}
+                ] 
             });
 
-            if (!tenants.length) {
-                return res.status(404).json({ message: "No tenants found" });
+
+            if (!tenant) {
+                return res.status(404).send({ message: "Tenant not found" });
             }
 
-            res.json(tenants);
+            return res.status(200).send(tenant);
         } catch (error) {
-            console.error("Error fetching tenants:", error);
-            res.status(500).json({ message: "Internal Server Error" });
+            console.error(error);
+            return res.status(500).send({ message: "Internal server error" });
         }
     }
 

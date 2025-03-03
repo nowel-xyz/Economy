@@ -25,28 +25,31 @@ export default function Login() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
+  
     const body = { email, password };
-
+  
     try {
-      const res = await axios.post(`${BACKEND_API}/auth/login`, body, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        withCredentials: true,
-      });
-
-      // Redirect to redirect_uri if available, otherwise go to the homepage
-      const redirectUrl = router.query.redirect_uri ? decodeURIComponent(router.query.redirect_uri as string) : '/';
-      router.push(redirectUrl);
+        await axios.post(`${BACKEND_API}/auth/login`, body, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          withCredentials: true,
+       });
+  
+        // Redirect and force a full page reload
+        const redirectUrl = router.query.redirect_uri
+          ? decodeURIComponent(router.query.redirect_uri as string)
+          : '/';
+        window.location.href = redirectUrl;
     } catch (err: any) {
-      if (err.response?.data?.message) {
-        setError(err.response.data.message);
-      } else {
-        setError(err.message || 'An unknown error occurred');
-      }
+        if (err.response?.data?.message) {
+          setError(err.response.data.message);
+        } else {
+          setError(err.message || 'An unknown error occurred');
+        }
     }
   };
+  
 
   return (
     <div style={{ maxWidth: 400, margin: 'auto', padding: '1rem' }}>

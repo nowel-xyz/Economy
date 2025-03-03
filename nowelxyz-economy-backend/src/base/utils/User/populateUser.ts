@@ -10,7 +10,7 @@ export default async function populateUser(
     next: NextFunction
 ): Promise<void> {
     const cookie = CheckCookie(req);
-
+    console.log("cookie", cookie);
     if (!cookie) {
         res.status(401).send({ message: "Unauthorized" });
         return;
@@ -23,7 +23,9 @@ export default async function populateUser(
             return;
         }
 
+        console.log(session);
         const user = await userSchema.findOne({ uid: session.userid });
+        console.log(user);
         if (!user) {
             res.status(404).send({ message: "Unauthorized" });
             return;

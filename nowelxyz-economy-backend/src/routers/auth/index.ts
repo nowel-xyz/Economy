@@ -2,7 +2,6 @@ import { Response, Router, Request } from "express";
 import User from "../../base/schemas/user"
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
-import nodemailer from "nodemailer"
 import session from "../../base/schemas/session";
 import CheckCookie from "../../base/utils/CheckCookie";
 import unique_uuid from "../../base/utils/unique_uuid";
@@ -71,7 +70,6 @@ export default class Auth {
 
         Userdata.cookie = sessionToken;
         Userdata.markModified('ips');
-        Userdata.sessions.push({ uid, cookie: sessionToken });
         await Userdata.save();
 
 

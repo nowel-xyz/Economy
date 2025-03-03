@@ -7,7 +7,6 @@ export interface IUser extends Document {
     name: string
     lastName: string
     password: string
-    sessions: ISession[],
     salt: string,
     ips: IUserIP[];
 
@@ -19,12 +18,6 @@ export interface IUser extends Document {
 }
 
 
-
-export interface ISession extends Document {
-    uid: string,
-    cookie: string,
-}
-
 const UserSchema = new Schema({
     uid: { type: String, required: true, unique: true},
     email: { type: String, required: true, unique: true},
@@ -32,12 +25,6 @@ const UserSchema = new Schema({
     lastName: { type: String, required: true},
     password: { type: String, required: true},
     salt: { type: String, required: true, default: "null"},
-    sessions: [
-        {
-            uid: { type: String, required: true },
-            cookie: { type: String, required: true },
-        },
-    ],
     ips: [
         {
             ip: { type: String, required: true },
