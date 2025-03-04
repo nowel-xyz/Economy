@@ -1,14 +1,31 @@
-import { useRouter } from "next/router";
+import { GetServerSideProps } from 'next';
 
-export default function TenantPage() {
-  const router = useRouter();
-  const { tenantid } = router.query;
+export const getServerSideProps: GetServerSideProps = async ({ req }) => {
+    const tenantDataHeader = req.headers['x-tenant-data'];
 
-  if (!tenantid) return <p>Loading...</p>;
+    let tenantData = null;
+    if (tenantDataHeader) {
+        try {
+            tenantData = JSON.parse(tenantDataHeader as string);
+        } catch (e) {
+            console.error('Failed to parse tenant data:', e);
+        }
+    }
 
-  return (
-    <div>
-      <h1>Tenant ID: {tenantid}</h1>
-    </div>
-  );
-}
+    return {
+        props: {
+            tenantData,
+        },
+    };
+};
+
+const TenantPage = ({ tenantData }: { tenantData: any }) => {
+    return (
+        <div>
+            <h1>Tenant Info</h1>
+            <pre>{JSON.stringify(tenantData, null, 2)}</pre>
+        </div>
+    );
+};
+
+export default TenantPage;

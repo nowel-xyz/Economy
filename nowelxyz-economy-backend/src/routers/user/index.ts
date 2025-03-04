@@ -2,6 +2,8 @@ import { Response, Router } from "express";
 import CustomRequest from "../../base/utils/CustomRequest";
 import ForamtUser from "../../base/utils/User/ForamtUser";
 import Tenantdb from "../../base/schemas/tenant";
+import Sessiondb from "../../base/schemas/session";
+import CheckCookie from "../../base/utils/CheckCookie";
 export default class User {
     public router: any;
 
@@ -13,6 +15,7 @@ export default class User {
     private initializeRouters() {
         this.router.get("/", this.user);
         this.router.get("/tenants", this.getTenants);
+        this.router.get("/session", this.getSession);
     }
 
     private async user(req: CustomRequest, res: Response) {
@@ -24,7 +27,7 @@ export default class User {
     }
 
     private async getTenants(req: CustomRequest, res: Response) {
-        console.log(req.user);
+       
         try {
             const tenants = await Tenantdb.find({
                 $or: [
@@ -43,6 +46,20 @@ export default class User {
             console.error("Error fetching tenants:", error);
             res.status(500).json({ message: "Internal Server Error" });
         }
+    }
+
+    private async getSession(req: CustomRequest, res: Response) {
+        console.log(req.user);
+        const cookie = CheckCookie(req);
+        
+        const session = await Sessiondb.findOne({ userid: req.user?.uid, cookie, inactive: false });
+        console.log(session);
+        if(!session) {
+            return res.status(404).send({ message: "session is inactive" });
+        }
+
+        return res.status(200).send({ message: "session is active", data: {user: {uid: session.userid}} });
+
     }
 
     public build() {

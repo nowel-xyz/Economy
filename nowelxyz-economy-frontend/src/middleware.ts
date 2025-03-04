@@ -9,6 +9,22 @@ export async function middleware(req: NextRequest) {
         return NextResponse.next();
     }
 
+
+    const cookie = req.headers.get('cookie');
+
+    const userRes = await fetch(`${BACKEND_API}/users/@me/session`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            ...(cookie ? { cookie } : {}),
+        },
+        credentials: 'include',
+    });
+
+    if (!userRes.ok) {
+        return NextResponse.redirect(new URL('/login', req.url));
+    }
+
     if (req.nextUrl.pathname.startsWith('/tenants')) {
         const tenantid = req.nextUrl.pathname.split('/')[2];
         if (!tenantid) {
@@ -16,7 +32,7 @@ export async function middleware(req: NextRequest) {
         }
 
         try {
-            const cookie = req.headers.get('cookie');
+            
             const res = await fetch(`${BACKEND_API}/tenant?uid=${tenantid}`, {
                 method: 'GET',
                 headers: {
@@ -33,6 +49,11 @@ export async function middleware(req: NextRequest) {
 
             const data = await res.json();
             console.log(data);
+
+            // Set the tenant data in response headers
+            const response = NextResponse.next();
+            response.headers.set('x-tenant-data', JSON.stringify(data));
+            return response;
         } catch (error) {
             console.error('Failed to fetch tenant:', error);
             return NextResponse.redirect(new URL('/', req.url));
