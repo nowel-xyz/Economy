@@ -25,14 +25,17 @@ export default function Home() {
   return (
     <div>
       <h1>Home, {user?.name} {user?.lastName}</h1>
-
-
+      
       <h1>Tenents:</h1>
-      {tenents.map((tenant: any) => (
-        <div key={tenant.uid} onClick={() => router.push(`/tenants/${tenant.uid}`)}>
-          <h1>{tenant.name}</h1>
-        </div>
-      ))}
+      {tenents.length === 0 ? 
+        <h1>No tenents</h1> 
+        : 
+        tenents.map((tenant: any) => (
+          <div key={tenant.uid} onClick={() => router.push(`/tenants/${tenant.uid}`)}>
+            <h1>{tenant.name}</h1>
+          </div>
+        ))
+      }
 
     </div>
   );

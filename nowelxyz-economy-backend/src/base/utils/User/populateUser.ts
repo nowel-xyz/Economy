@@ -23,9 +23,7 @@ export default async function populateUser(
             return;
         }
 
-        console.log(session);
         const user = await userSchema.findOne({ uid: session.userid });
-        console.log(user);
         if (!user) {
             res.status(404).send({ message: "Unauthorized" });
             return;
@@ -33,7 +31,6 @@ export default async function populateUser(
 
         req.user = user;
 
-        // Update session activity timestamp
         session.lastActive = new Date();
         await session.save();
 
