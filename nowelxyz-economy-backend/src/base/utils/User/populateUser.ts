@@ -10,7 +10,6 @@ export default async function populateUser(
     next: NextFunction
 ): Promise<void> {
     const cookie = CheckCookie(req);
-    console.log("cookie", cookie);
     if (!cookie) {
         res.status(401).send({ message: "Unauthorized" });
         return;

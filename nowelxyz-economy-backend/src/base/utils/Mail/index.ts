@@ -1,14 +1,15 @@
 import nodemailer from "nodemailer"
+import EnvManager from "../EnvManager";
 
 export default class MailManger {
     private transporter: any;
 
     constructor() {
     this.transporter = nodemailer.createTransport({
-            host: process.env.MAIL_HOST,
+            host:  EnvManager.get("MAIL_HOST"),
             auth: {
-                user: process.env.MAIL_USER,
-                pass: process.env.MAIL_PASSWORD,
+                user:  EnvManager.get("MAIL_USER"),
+                pass:  EnvManager.get("MAIL_PASSWORD"),
             },
 
         });
@@ -16,7 +17,7 @@ export default class MailManger {
 
     public async sendMail(email: string, subject: string, text: string) {
         const mailOptions = {
-            from: process.env.MAIL_USER,
+            from: EnvManager.get("MAIL_USER"),
             to: email,
             subject,
             text,

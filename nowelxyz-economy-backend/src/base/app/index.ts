@@ -3,6 +3,7 @@ import cors from "cors"
 import cookieParser from "cookie-parser"
 import { connect } from "mongoose"
 import Routers from "./Routers"
+import EnvManager from "../utils/EnvManager"
 
 export default class CrateApp {
     
@@ -10,7 +11,6 @@ export default class CrateApp {
     private mongoooseURL: string
 
     constructor({port, mongoooseURL}: { port: number, mongoooseURL: string}) {  
-        if(!mongoooseURL) throw new Error("Mongoose url must be provided")
         this.port = port
         this.mongoooseURL = mongoooseURL
     } 
@@ -18,7 +18,7 @@ export default class CrateApp {
     private App() {
         const app = express()
 
-        app.use(cors({ origin: process.env.FRONTEND_URL, credentials: true}))
+        app.use(cors({ origin: EnvManager.get("FRONTEND_URL"), credentials: true}))
         app.use(cookieParser());
 
         app.use(express.json());
@@ -32,6 +32,15 @@ export default class CrateApp {
     }
 
     public init() {
+
+        try {
+            EnvManager.checkDefiendEnvs();
+        } catch (error) {
+            console.error(error)
+            process.exit(1)
+        }
+
+        if(!this.mongoooseURL) throw new Error("Mongoose url must be provided")
         connect(this.mongoooseURL).then(() => {
             console.log(`[Database] - Connected`)
         }).catch((err) => { console.error(`[Database] - ${err}`)})

@@ -7,6 +7,7 @@ import CheckCookie from "../../base/utils/CheckCookie";
 import unique_uuid from "../../base/utils/unique_uuid";
 import MailManger from "../../base/utils/Mail";
 import populateUser from "../../base/utils/User/populateUser";
+import EnvManager from "../../base/utils/EnvManager";
 
 
 export default class Auth {
@@ -16,10 +17,9 @@ export default class Auth {
     constructor() {
         this.router = Router()
         this.initializeRouters()
-        this.privateKey = process.env.SECRET_KEY || 'defaultSecretKey';
+        this.privateKey = EnvManager.get("SECRET_KEY");
     }
-
-
+    
     private initializeRouters() {
         this.router.post("/login", this.login.bind(this))
         this.router.get("/logout", populateUser, this.logout.bind(this))
@@ -94,7 +94,7 @@ export default class Auth {
             sessiondDB.inactive = true;
             await sessiondDB.save();
         }
-        return res.redirect(`${process.env.FRONTEND}/`)
+        return res.redirect(`${EnvManager.get("FRONTEND")}/`)
     }
 
     private async register(req: Request, res: Response) {
@@ -134,7 +134,7 @@ export default class Auth {
 
         // TODO: get mail content form database
         const subject = "New account created";
-        const text = `Hi ${name} ${lastName},\n\nWelcome to ${process.env.DOMAIN_NAME}\n\nWe are excited to have you on board!`;
+        const text = `Hi ${name} ${lastName},\n\nWelcome to ${EnvManager.get("DOMAIN_NAME")}\n\nWe are excited to have you on board!`;
         new MailManger().sendMail(userObject.email, subject, text);
     }
 
