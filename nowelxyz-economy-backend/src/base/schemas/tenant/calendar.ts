@@ -22,14 +22,12 @@ export interface IYear extends Document {
 }
 
 
-export interface ISession extends Document {
-    uid: string,
+export interface ICalendar extends Document {
     tenantid: string,
     year: IYear[],
 }
 
-const SessionSchema = new Schema({
-    uid: { type: String, required: true, unique: true},
+const calendarSchema = new Schema({
     tenantid: { type: String, required: true },
     year: [
         {
@@ -64,4 +62,4 @@ const SessionSchema = new Schema({
     
 })
 
-export default mongoose.models.Session || mongoose.model<ISession>("Session", SessionSchema)
+export default mongoose.models.calendar || mongoose.model<ICalendar>("calendar", calendarSchema)

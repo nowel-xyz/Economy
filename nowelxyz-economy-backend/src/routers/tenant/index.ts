@@ -4,6 +4,7 @@ import Tenantdb from "../../base/schemas/tenant";
 import unique_uuid from "../../base/utils/unique_uuid";
 import TenantMembers from "./members";
 import TenantRoles from "./roles";
+import Calendar from "./calendar";
 
 export default class Tenant {
     public router: any;
@@ -16,7 +17,8 @@ export default class Tenant {
 
     private initializeRouters() {
         this.router.post("/", this.newTenant)
-        this.router.get("/", this.getTenant)
+        this.router.get("/:uid", this.getTenant)
+        this.router.get("/:uid/", new Calendar().build())
         this.router.use("/members", new TenantMembers().build())
         this.router.use("/roles", new TenantRoles().build())
     }
@@ -48,7 +50,7 @@ export default class Tenant {
     }
 
     private async getTenant(req: CustomRequest, res: Response) {
-        const { uid } = req.query;
+        const { uid } = req.params;
         if (!uid) {
             return res.status(400).send({ message: "missing required inputs" });
         }
