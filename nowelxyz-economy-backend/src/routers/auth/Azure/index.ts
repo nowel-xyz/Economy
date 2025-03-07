@@ -56,7 +56,7 @@ export default class AuthAzure {
             console.log(response.data)
             // const { access_token } = response.data;
             
-            const userResponse = await axios.get("https://graph.microsoft.com/v1.0/me", {
+            const userResponse = await axios.get("https://graph.microsoft.com/beta/me", {
                 headers: { Authorization: `Bearer ${response.data.access_token}` }
             });
             
