@@ -24,7 +24,7 @@ export default class AuthAzure {
         const params = {
             client_id: process.env.AZURE_CLIENT_ID,
             response_type: "code",
-            redirect_uri: process.env.CALLBACK_URL,
+            redirect_uri: process.env.AZURE_CALLBACK_URL,
             scope: "openid profile email User.Read",
             response_mode: "query"
         };
@@ -44,7 +44,7 @@ export default class AuthAzure {
                 client_id: process.env.AZURE_CLIENT_ID,
                 client_secret: process.env.AZURE_CLIENT_SECRET,
                 code,
-                redirect_uri: process.env.CALLBACK_URL,
+                redirect_uri: process.env.AZURE_CALLBACK_URL,
                 grant_type: "authorization_code"
             };
 

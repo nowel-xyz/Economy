@@ -9,6 +9,7 @@ import MailManger from "../../base/utils/Mail";
 import populateUser from "../../base/utils/User/populateUser";
 import EnvManager from "../../base/utils/EnvManager";
 import AuthAzure from "./Azure";
+import Authentik from "./Authentik";
 
 
 export default class Auth {
@@ -26,6 +27,7 @@ export default class Auth {
         this.router.get("/logout", populateUser, this.logout.bind(this))
         this.router.post("/register", this.register.bind(this))
         this.router.use("/azure", new AuthAzure().build())
+        this.router.use("/local", new Authentik().build())
     }
 
     private async login(req: Request, res: Response) {
