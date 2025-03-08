@@ -27,7 +27,7 @@ export default class Auth {
         this.router.get("/logout", populateUser, this.logout.bind(this))
         this.router.post("/register", this.register.bind(this))
         this.router.use("/azure", new AuthAzure().build())
-        this.router.use("/local", new Authentik().build())
+        this.router.use("/authentik", new Authentik().build())
     }
 
     private async login(req: Request, res: Response) {

@@ -16,11 +16,11 @@ export default class Authentik {
         this.router = Router();
         this.initializeRoutes();
         this.jwtSecret = process.env.JWT_SECRET || ""
-        this.clientID = process.env.AUTHENTI_LOCAL_CLIENT_ID;
-        this.clientSecret = process.env.AUTHENTI_LOCAL_CLIENT_SECRET;
-        this.redirectURI = process.env.AUTHENTI_LOCAL_CALLBACK_URL;
-        this.authorizationURL = `${process.env.AUTHENTI_LOCAL_BASE_URL}/application/o/authorize/`;
-        this.tokenURL = `${process.env.AUTHENTI_LOCAL_BASE_URL}/application/o/token/`
+        this.clientID = process.env.AUTHENTIK_CLIENT_ID;
+        this.clientSecret = process.env.AUTHENTIK_CLIENT_SECRET;
+        this.redirectURI = process.env.AUTHENTIK_CALLBACK_URL;
+        this.authorizationURL = `${process.env.AUTHENTIK_BASE_URL}/application/o/authorize/`;
+        this.tokenURL = `${process.env.AUTHENTIK_BASE_URL}/application/o/token/`
     }
 
     private initializeRoutes() {
@@ -60,7 +60,7 @@ export default class Authentik {
             
         const { access_token, expires_in } = response.data;
     
-            const userInfo = await axios.get(`${process.env.AUTHENTI_LOCAL_BASE_URL}/application/o/userinfo/`, {
+            const userInfo = await axios.get(`${process.env.AUTHENTIK_BASE_URL}/application/o/userinfo/`, {
                 headers: {
                     Authorization: `Bearer ${access_token}`,
                 }
