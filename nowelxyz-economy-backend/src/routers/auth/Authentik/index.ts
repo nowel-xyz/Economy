@@ -76,7 +76,6 @@ export default class Authentik {
         const { data } = userInfo;
         const ip = req.ip || req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 
-
         const existingUser = await AuthentikUser.findOne({ uid: data.sub });
         if(existingUser) {
             existingUser.accessToken = access_token;
@@ -86,6 +85,7 @@ export default class Authentik {
             existingUser.idToken = data.sub;
             existingUser.email = data.email;
             existingUser.name = data.name;
+            existingUser.idToken = response.data.id_token;
             const existingIp = existingUser.ips.find((entry: { ip: string }) => entry.ip === ip);
             existingIp ? existingIp.loginTimes++ : existingUser.ips.push({ ip, loginTimes: 1, LastLogin: new Date() });
             await existingUser.save();
@@ -98,7 +98,7 @@ export default class Authentik {
                 tokenType: response.data.token_type,
                 scope: response.data.scope,
                 expiresIn: expires_in,
-                idToken: data.sub,
+                idToken: response.data.id_token,
                 ips: [{ ip, loginTimes: 0, LastLogin: new Date() }],
             }).save();
         }
