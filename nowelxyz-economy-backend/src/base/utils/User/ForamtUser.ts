@@ -1,6 +1,4 @@
-import { IAuthentikUser } from "../../schemas/oauth/authentik";
-import { IUser } from "../../schemas/user";
-import IAuth, { ILocalUser, ILocalAuthentikUser, IGlobalUser } from "../../types/IAuth";
+import IAuth, { IGlobalUser } from "../../types/IAuth";
 
 export default function FormatUserData(Auth: IAuth): IGlobalUser | null {
     // Ensure we have a plain object

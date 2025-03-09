@@ -86,7 +86,8 @@ export default class Authentik {
             existingUser.idToken = data.sub;
             existingUser.email = data.email;
             existingUser.name = data.name;
-            existingUser.ips.push({ ip, loginTimes: 0, LastLogin: new Date() });
+            const existingIp = existingUser.ips.find((entry: { ip: string }) => entry.ip === ip);
+            existingIp ? existingIp.loginTimes++ : existingUser.ips.push({ ip, loginTimes: 1, LastLogin: new Date() });
             await existingUser.save();
         } else {
             new AuthentikUser({
