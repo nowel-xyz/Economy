@@ -1,6 +1,6 @@
-import {IUser} from "../schemas/user";
 import { Request } from "express"
+import IAuth from "../types/IAuth";
 
 export default interface CustomRequest extends Request {
-    user?: IUser
+    user?: IAuth
 }

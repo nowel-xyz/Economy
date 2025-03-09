@@ -19,10 +19,15 @@ export default class User {
     }
 
     private async user(req: CustomRequest, res: Response) {
+        console.log(req.user);
         if (!req.user) {
-            return res.status(404).send({ message: "Unauthorized" });
+            return res.status(404).send({ message: "User not found" });
         }
         const user = ForamtUser(req.user);
+        if(!user) {
+            return res.status(404).send({ message: "User not found" });
+        }
+
         return res.status(200).send({ message: `${user.name} ${user.lastName} user data`, data: user });
     }
 
@@ -31,8 +36,8 @@ export default class User {
         try {
             const tenants = await Tenantdb.find({
                 $or: [
-                    { ownerid: req.user?.uid },
-                    { members: { $elemMatch: { uid: req.user?.uid } } }
+                    { ownerid: req.user?.global.uid },
+                    { members: { $elemMatch: { uid: req.user?.global.uid } } }
                 ]
             });
             
@@ -52,7 +57,7 @@ export default class User {
         console.log(req.user);
         const cookie = CheckCookie(req);
         
-        const session = await Sessiondb.findOne({ userid: req.user?.uid, cookie, inactive: false });
+        const session = await Sessiondb.findOne({ userid: req.user?.global.uid, cookie, inactive: false });
         console.log(session);
         if(!session) {
             return res.status(404).send({ message: "session is inactive" });

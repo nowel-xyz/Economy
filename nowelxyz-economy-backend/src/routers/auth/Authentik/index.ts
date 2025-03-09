@@ -1,6 +1,13 @@
 import { Router, Response, Express } from 'express';
 import CustomRequest from '../../../base/utils/CustomRequest';
 import axios from "axios";
+import AuthentikUser from '../../../base/schemas/oauth/authentik';
+import session from '../../../base/schemas/session';
+import unique_uuid from '../../../base/utils/unique_uuid';
+import jwt from 'jsonwebtoken';
+import EnvManager from '../../../base/utils/EnvManager';
+import User from '../../user';
+import { UserType } from '../../../base/schemas/user';
 
 export default class Authentik {
     public router: any
@@ -11,10 +18,12 @@ export default class Authentik {
     tokenURL: string;
     jwtSecret: string;
     transporter: any;
+    privateKey: any;
 
     constructor() {
         this.router = Router();
         this.initializeRoutes();
+        this.privateKey = EnvManager.get("SECRET_KEY");
         this.jwtSecret = process.env.JWT_SECRET || ""
         this.clientID = process.env.AUTHENTIK_CLIENT_ID;
         this.clientSecret = process.env.AUTHENTIK_CLIENT_SECRET;
@@ -34,8 +43,6 @@ export default class Authentik {
     private login = async (req: CustomRequest, res: Response) => {
         res.redirect(`${this.authorizationURL}?response_type=code&client_id=${this.clientID}&redirect_uri=${this.redirectURI}&scope=openid profile email`);
     }
-
-
 
     private callback = async (req: CustomRequest, res: Response) => { 
         const { code } = req.query;
@@ -60,16 +67,66 @@ export default class Authentik {
             
         const { access_token, expires_in } = response.data;
     
-            const userInfo = await axios.get(`${process.env.AUTHENTIK_BASE_URL}/application/o/userinfo/`, {
-                headers: {
-                    Authorization: `Bearer ${access_token}`,
-                }
-            });
-    
-            const { data } = userInfo;
+        const userInfo = await axios.get(`${process.env.AUTHENTIK_BASE_URL}/application/o/userinfo/`, {
+            headers: {
+                Authorization: `Bearer ${access_token}`,
+            }
+        });
 
-            res.send({ user: data });
+        const { data } = userInfo;
+        const ip = req.ip || req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 
+
+        const existingUser = await AuthentikUser.findOne({ uid: data.sub });
+        if(existingUser) {
+            existingUser.accessToken = access_token;
+            existingUser.tokenType = response.data.token_type;
+            existingUser.scope = response.data.scope;
+            existingUser.expiresIn = expires_in;
+            existingUser.idToken = data.sub;
+            existingUser.email = data.email;
+            existingUser.name = data.name;
+            existingUser.ips.push({ ip, loginTimes: 0, LastLogin: new Date() });
+            await existingUser.save();
+        } else {
+            new AuthentikUser({
+                uid: data.sub,
+                email: data.email,
+                name: data.name,
+                accessToken: access_token,
+                tokenType: response.data.token_type,
+                scope: response.data.scope,
+                expiresIn: expires_in,
+                idToken: data.sub,
+                ips: [{ ip, loginTimes: 0, LastLogin: new Date() }],
+            }).save();
+        }
+
+        
+        let uid = await unique_uuid(session);
+
+
+        const sessionToken = jwt.sign({ uid: data.sub, email: data.email }, this.privateKey as string);
+
+
+        await session.create({
+            uid,
+            userid: data.sub,
+            ip,
+            lastActive: Date.now(),
+            cookie: sessionToken,
+            type: UserType.authentik,
+        });
+
+        res.cookie("sessionToken", sessionToken, {
+            httpOnly: true,
+            secure: true,
+            sameSite: "strict",
+            maxAge: 1000 * 60 * 60 * 24,
+        });
+
+        
+        res.status(200).send({ message: "Login successfully", User: { email: data.email } });
         } catch (error: any) {
             console.error('Error exchanging code for token:', error.response ? error.response.data : error.message);
             res.status(500).send('Error during token exchange');

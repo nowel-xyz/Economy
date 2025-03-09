@@ -1,4 +1,5 @@
 import mongoose, { Document, Schema} from "mongoose";
+import { UserType } from "./user";
 
 export interface ISession extends Document {
     uid: string,
@@ -16,6 +17,7 @@ const SessionSchema = new Schema({
     lastActive: { type: Date, required: true, default: Date.now() },
     cookie: { type: String, required: true, default: "null"},
     inactive: { type: Boolean, required: true, default: false},
+    type: { type: String, required: true, enum: Object.values(UserType), default: UserType.local },
 },
 { 
     timestamps: true,

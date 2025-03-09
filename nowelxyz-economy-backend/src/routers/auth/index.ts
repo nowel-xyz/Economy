@@ -10,6 +10,7 @@ import populateUser from "../../base/utils/User/populateUser";
 import EnvManager from "../../base/utils/EnvManager";
 import AuthAzure from "./Azure";
 import Authentik from "./Authentik";
+import { UserType } from "../../base/schemas/user";
 
 
 export default class Auth {
@@ -57,7 +58,7 @@ export default class Auth {
         }
 
 
-        let uid = await unique_uuid(User);
+        let uid = await unique_uuid(session);
 
 
         const sessionToken = jwt.sign({ uid: Userdata.uid, email }, this.privateKey as string);
@@ -116,7 +117,6 @@ export default class Auth {
         const hashedPassword = await bcrypt.hash(password, salt);
 
         const ip = req.ip || req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-
         const user = await new User({
             uid,
             name,
@@ -125,6 +125,7 @@ export default class Auth {
             password: hashedPassword,
             ips: [{ ip, loginTimes: 0, }],
             email,
+            type: UserType.local,
         }).save();
 
         const userObject = user.toObject();

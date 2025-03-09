@@ -33,7 +33,7 @@ export default class TenantMembers {
 
 
             //TODO check perms of roles
-            if (tenant.ownerid !== req.user?.uid) {
+            if (tenant.ownerid !== req.user?.global.uid) {
                 return res.status(403).send({ message: "You are not the owner of this tenant" });
             }
 
@@ -64,7 +64,7 @@ export default class TenantMembers {
                 return res.status(404).send({ message: "Tenant not found" });
             }
 
-            if (!tenant.members.includes(req.user?.uid)) {
+            if (!tenant.members.includes(req.user?.global.uid)) {
                 return res.status(403).send({ message: "You are not a member of this tenant" });
             }
 
@@ -89,8 +89,8 @@ export default class TenantMembers {
                 return res.status(404).json({ message: "Tenant not found" });
             }
 
-            const isOwner = tenant.ownerid === req.user?.uid;
-            const isSelfRemoval = memberuid === req.user?.uid;
+            const isOwner = tenant.ownerid === req.user?.global.uid;
+            const isSelfRemoval = memberuid === req.user?.global.uid;
 
             if (!isOwner && !isSelfRemoval) {
                 return res.status(403).json({ message: "You do not have permission to remove this member" });

@@ -36,8 +36,8 @@ export default class Tenant {
                 {
                     uid,
                     name,
-                    members: { uid: req.user?.uid},
-                    ownerid: req.user?.uid,
+                    members: { uid: req.user?.global.uid},
+                    ownerid: req.user?.global.uid,
                     roles: []
                 }).save();
 
@@ -59,7 +59,7 @@ export default class Tenant {
             const tenant = await Tenantdb.findOne({ $and: 
                 [
                     { uid }, 
-                    { members: { $elemMatch: { uid: req.user?.uid }}}
+                    { members: { $elemMatch: { uid: req.user?.global.uid }}}
                 ] 
             });
 

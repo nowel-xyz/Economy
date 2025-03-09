@@ -15,7 +15,16 @@ export interface IUser extends Document {
     deleteAccontToken: string,
     deleteAccontExpires: Date
     __v: number
+    type: string
 }
+
+
+export enum UserType {
+    local = "local",
+    azure = "azure",
+    authentik = "authentik",
+}
+
 
 
 const UserSchema = new Schema({
@@ -36,6 +45,7 @@ const UserSchema = new Schema({
     resetPasswordExpires: { type: Date, required: false},
     deleteAccontToken: { type: String, required: false, default: "null"},
     deleteAccontExpires: { type: Date, required: false},
+    type: { type: String, required: true, enum: Object.values(UserType), default: UserType.local },
 },
 {
     timestamps: true,

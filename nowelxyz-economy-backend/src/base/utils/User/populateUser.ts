@@ -1,8 +1,10 @@
 import { Response, NextFunction } from "express";
-import userSchema from "../../schemas/user";
+import userSchema, { UserType } from "../../schemas/user";
 import sessionSchema from "../../schemas/session";
 import CustomRequest from "../CustomRequest";
 import CheckCookie from "../CheckCookie";
+import authentik from "../../schemas/oauth/authentik";
+import { IGlobalUser } from "../../types/IAuth";
 
 export default async function populateUser(
     req: CustomRequest,
@@ -10,6 +12,7 @@ export default async function populateUser(
     next: NextFunction
 ): Promise<void> {
     const cookie = CheckCookie(req);
+    console.log(cookie);
     if (!cookie) {
         res.status(401).send({ message: "Unauthorized" });
         return;
@@ -21,14 +24,55 @@ export default async function populateUser(
             res.status(401).send({ message: "Invalid session or session expired" });
             return;
         }
+        let globalUserdata: IGlobalUser;
 
-        const user = await userSchema.findOne({ uid: session.userid });
-        if (!user) {
-            res.status(404).send({ message: "Unauthorized" });
-            return;
+        switch (session.type) {
+            case UserType.local:
+                const user = await userSchema.findOne({ uid: session.userid });
+                if (!user) {
+                    res.status(404).send({ message: "Unauthorized" });
+                    return;
+                }
+
+                globalUserdata = {
+                    uid: user.uid,
+                    email: user.email,
+                    name: user.name,
+                    lastName: user.lastName,
+                    type: UserType.local
+                }
+
+                req.user = {
+                    global: globalUserdata,
+                    authentik: null,
+                    local: user
+                }
+                break;
+            case UserType.authentik:
+                const authentikUser = await authentik.findOne({ uid: session.userid });
+                if (!authentikUser) {
+                    res.status(404).send({ message: "Unauthorized" });
+                    return;
+                }
+
+                globalUserdata = {
+                    uid: authentikUser.uid,
+                    email: authentikUser.email,
+                    name: authentikUser.name,
+                    lastName: authentikUser.lastName,
+                    type: UserType.authentik
+                }
+
+                req.user = {
+                    global: globalUserdata,
+                    authentik: authentikUser,
+                    local: null
+                }
+                break;
+            default:
+                res.status(500).send({ message: "Internal server error" });
+                return;
         }
-
-        req.user = user;
 
         session.lastActive = new Date();
         await session.save();
