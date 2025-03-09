@@ -41,11 +41,20 @@ export default class Authentik {
 
 
     private login = async (req: CustomRequest, res: Response) => {
-        res.redirect(`${this.authorizationURL}?response_type=code&client_id=${this.clientID}&redirect_uri=${this.redirectURI}&scope=openid profile email`);
+        const fallbackURL = `${process.env.FRONTEND_URL}/`;
+        const redirect_uri_raw = req.query.redirect_uri || fallbackURL;
+    
+        const redirect_uri =
+            typeof redirect_uri_raw === 'string' && process.env.FRONTEND_URL && redirect_uri_raw.startsWith(process.env.FRONTEND_URL)
+                ? redirect_uri_raw
+                : fallbackURL;
+
+
+        res.redirect(`${this.authorizationURL}?response_type=code&client_id=${this.clientID}&redirect_uri=${this.redirectURI}&scope=openid profile email&state=${encodeURIComponent(redirect_uri)}`);
     }
 
     private callback = async (req: CustomRequest, res: Response) => { 
-        const { code } = req.query;
+        const { code, state } = req.query;
     
         if (!code || typeof code !== 'string') {
             return res.status(400).send('Authorization code not provided or invalid');
@@ -127,7 +136,13 @@ export default class Authentik {
         });
 
         
-        res.status(200).send({ message: "Login successfully", User: { email: data.email } });
+        //res.status(200).send({ message: "Login successfully", User: { email: data.email } });
+        if (typeof state === 'string') {
+            res.redirect(state);
+        } else {
+            res.status(400).send('Invalid state parameter');
+        }
+        
         } catch (error: any) {
             console.error('Error exchanging code for token:', error.response ? error.response.data : error.message);
             res.status(500).send('Error during token exchange');
