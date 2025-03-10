@@ -9,20 +9,6 @@ export default function Login() {
   const [error, setError] = useState('');
   const router = useRouter();
 
-  // TODO: shoud we keep this?
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const res = await axios.get(`${BACKEND_API}/users/@me`, { withCredentials: true });
-        if (res.data.uid) {
-          router.push(router.query.redirect_uri?.toString() || '/');
-        }
-      } catch (err) {}
-    };
-
-    checkAuth();
-  }, []);
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
   
@@ -76,10 +62,16 @@ export default function Login() {
             style={{ width: '100%', padding: '0.5rem' }}
           />
         </div>
-        <button type="submit" style={{ padding: '0.5rem 1rem' }}>
+        <button type="submit" style={{ padding: '0.5rem 1rem', marginBottom: '1rem' }}>
           Login
         </button>
       </form>
+      <button onClick={() => window.location.href = `${BACKEND_API}/auth/azure/login`} style={{ width: '100%', padding: '0.5rem', marginBottom: '0.5rem' }}>
+        Login with Azure
+      </button>
+      <button onClick={() => window.location.href = `${BACKEND_API}/auth/authentik/login`} style={{ width: '100%', padding: '0.5rem' }}>
+        Login with Authentik
+      </button>
     </div>
   );
 }

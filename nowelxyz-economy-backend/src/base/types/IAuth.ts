@@ -6,7 +6,7 @@ export default interface IAuth {
     global: IGlobalUser
     local: IUser | null 
     authentik: IAuthentikUser | null 
-    azurekUser: IAzureUser | null
+    azureUser: IAzureUser | null
 }
 
 

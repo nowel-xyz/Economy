@@ -24,7 +24,7 @@ export default function Home() {
 
   return (
     <div>
-      <h1>Home, {user?.name} {user?.lastName}</h1>
+      <h1>Home, {user?.name} {user?.lastName} {user?.email ? `email: ${user.email}` : ""}</h1>
       
       <h1>Tenents:</h1>
       {tenents.length === 0 ? 

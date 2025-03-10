@@ -30,11 +30,15 @@ export default class AuthAzure {
     private async login(req: Request, res: Response) {
         const fallbackURL = `${process.env.FRONTEND_URL}/`;
         const redirect_uri_raw = req.query.redirect_uri || fallbackURL;
-    
+
         const redirect_uri =
-            typeof redirect_uri_raw === 'string' && process.env.FRONTEND_URL && redirect_uri_raw.startsWith(process.env.FRONTEND_URL)
+            typeof redirect_uri_raw === 'string' &&
+            process.env.FRONTEND_URL &&
+            redirect_uri_raw.startsWith(process.env.FRONTEND_URL)
                 ? redirect_uri_raw
                 : fallbackURL;
+
+        console.log("Setting state parameter:", redirect_uri);
 
         const authUrl = `https://login.microsoftonline.com/${process.env.AZURE_TENANT_ID}/oauth2/v2.0/authorize`;
         const params = {
@@ -133,8 +137,20 @@ export default class AuthAzure {
             });
 
         //res.status(200).send({ message: "Login successfully", User: { email: data.mail } });
+        console.log("state", state)
         if (typeof state === 'string') {
-            res.redirect(state);
+            res.send(`
+                <html>
+                  <head>
+                    <meta http-equiv="refresh" content="1;url=${state}" />
+                  </head>
+                  <body>
+                    <p>Redirecting you in a moment...</p>
+                    <script>window.location.href = "${state}";</script>
+                  </body>
+                </html>
+              `);
+              
         } else {
             res.status(400).send('Invalid state parameter');
         }

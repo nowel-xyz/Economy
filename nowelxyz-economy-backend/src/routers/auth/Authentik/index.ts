@@ -138,7 +138,17 @@ export default class Authentik {
         
         //res.status(200).send({ message: "Login successfully", User: { email: data.email } });
         if (typeof state === 'string') {
-            res.redirect(state);
+            res.send(`
+                <html>
+                  <head>
+                    <meta http-equiv="refresh" content="1;url=${state}" />
+                  </head>
+                  <body>
+                    <p>Redirecting you in a moment...</p>
+                    <script>window.location.href = "${state}";</script>
+                  </body>
+                </html>
+              `);
         } else {
             res.status(400).send('Invalid state parameter');
         }

@@ -47,7 +47,7 @@ export default async function populateUser(
                     global: globalUserdata,
                     authentik: null,
                     local: user,
-                    azurekUser: null
+                    azureUser: null
                 }
                 break;
             case UserType.authentik:
@@ -69,21 +69,21 @@ export default async function populateUser(
                     global: globalUserdata,
                     authentik: authentikUser,
                     local: null,
-                    azurekUser: null
+                    azureUser: null
                 }
                 break;
             case UserType.azure: 
-            const azurekUser = await azure.findOne({ uid: session.userid });
-            if (!azurekUser) {
+            const azureUser = await azure.findOne({ uid: session.userid });
+            if (!azureUser) {
                 res.status(404).send({ message: "Unauthorized" });
                 return;
             }
 
             globalUserdata = {
-                uid: azurekUser.uid,
-                email: azurekUser.email,
-                name: azurekUser.name,
-                lastName: azurekUser.lastName,
+                uid: azureUser.uid,
+                email: azureUser.email,
+                name: azureUser.name,
+                lastName: azureUser.lastName,
                 type: UserType.azure
             }
 
@@ -91,7 +91,7 @@ export default async function populateUser(
                 global: globalUserdata,
                 authentik: null,
                 local: null,
-                azurekUser: azurekUser
+                azureUser: azureUser
             }
             break;
             default:

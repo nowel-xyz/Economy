@@ -54,9 +54,8 @@ export default class User {
     }
 
     private async getSession(req: CustomRequest, res: Response) {
-        console.log(req.user);
         const cookie = CheckCookie(req);
-        
+
         const session = await Sessiondb.findOne({ userid: req.user?.global.uid, cookie, inactive: false });
         console.log(session);
         if(!session) {
