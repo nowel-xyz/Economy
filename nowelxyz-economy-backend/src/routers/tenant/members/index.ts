@@ -6,7 +6,7 @@ export default class TenantMembers {
     public router: any;
 
     constructor() {
-        this.router = Router()
+        this.router = Router({ mergeParams: true })
         this.initializeRouters()
     }
 
@@ -52,14 +52,15 @@ export default class TenantMembers {
     }
 
     private async tenantMembers(req: CustomRequest, res: Response) {
-        const { tenantuid } = req.query;
-        if (!tenantuid) {
+        const { uid } = req.params;
+        console.log(uid)
+        if (!uid) {
             return res.status(400).send({ message: "missing required inputs" });
         }
 
 
         try {
-            const tenant = await Tenantdb.findOne({ uid: tenantuid });
+            const tenant = await Tenantdb.findOne({ uid });
             if (!tenant) {
                 return res.status(404).send({ message: "Tenant not found" });
             }

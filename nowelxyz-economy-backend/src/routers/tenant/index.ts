@@ -18,8 +18,8 @@ export default class Tenant {
     private initializeRouters() {
         this.router.post("/", this.newTenant)
         this.router.get("/:uid", this.getTenant)
-        this.router.get("/:uid/", new Calendar().build())
-        this.router.use("/members", new TenantMembers().build())
+        this.router.get("/:uid/calendar", new Calendar().build())
+        this.router.use("/:uid/members", new TenantMembers().build())
         this.router.use("/roles", new TenantRoles().build())
     }
 
