@@ -33,7 +33,7 @@ export async function middleware(req: NextRequest) {
 
         try {
             
-            const res = await fetch(`${BACKEND_API}/tenant?uid=${tenantid}`, {
+            const res = await fetch(`${BACKEND_API}/tenant/${tenantid}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
