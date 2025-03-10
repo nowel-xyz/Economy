@@ -1,10 +1,12 @@
 import { IAuthentikUser } from "../schemas/oauth/authentik";
+import { IAzureUser } from "../schemas/oauth/azure";
 import { IUser } from "../schemas/user";
 
 export default interface IAuth {
     global: IGlobalUser
     local: IUser | null 
     authentik: IAuthentikUser | null 
+    azurekUser: IAzureUser | null
 }
 
 

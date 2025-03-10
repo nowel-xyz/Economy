@@ -5,6 +5,7 @@ import CustomRequest from "../CustomRequest";
 import CheckCookie from "../CheckCookie";
 import authentik from "../../schemas/oauth/authentik";
 import { IGlobalUser } from "../../types/IAuth";
+import azure from "../../schemas/oauth/azure";
 
 export default async function populateUser(
     req: CustomRequest,
@@ -25,7 +26,7 @@ export default async function populateUser(
             return;
         }
         let globalUserdata: IGlobalUser;
-
+        
         switch (session.type) {
             case UserType.local:
                 const user = await userSchema.findOne({ uid: session.userid });
@@ -45,7 +46,8 @@ export default async function populateUser(
                 req.user = {
                     global: globalUserdata,
                     authentik: null,
-                    local: user
+                    local: user,
+                    azurekUser: null
                 }
                 break;
             case UserType.authentik:
@@ -66,9 +68,32 @@ export default async function populateUser(
                 req.user = {
                     global: globalUserdata,
                     authentik: authentikUser,
-                    local: null
+                    local: null,
+                    azurekUser: null
                 }
                 break;
+            case UserType.azure: 
+            const azurekUser = await azure.findOne({ uid: session.userid });
+            if (!azurekUser) {
+                res.status(404).send({ message: "Unauthorized" });
+                return;
+            }
+
+            globalUserdata = {
+                uid: azurekUser.uid,
+                email: azurekUser.email,
+                name: azurekUser.name,
+                lastName: azurekUser.lastName,
+                type: UserType.azure
+            }
+
+            req.user = {
+                global: globalUserdata,
+                authentik: null,
+                local: null,
+                azurekUser: azurekUser
+            }
+            break;
             default:
                 res.status(500).send({ message: "Internal server error" });
                 return;
