@@ -1,5 +1,6 @@
 import { Response, Router, Request } from "express";
-import CalendarYear from "../../../base/schemas/tenant/calendar";
+import CalendarYear from "../../../base/schemas/tenant/calendar"; // This file now exports the updated CalendarYear model
+import CustomRequest from "../../../base/utils/CustomRequest";
 
 export default class Calendar {
   public router: any;
@@ -16,7 +17,7 @@ export default class Calendar {
     this.router.post("/:year/:month/:day", this.newCalendarDay);
   }
 
-  private async getCalendar(req: Request, res: Response) {
+  private async getCalendar(req: CustomRequest, res: Response) {
     const { uid, year } = req.params;
     // Find the calendar document for this tenant and year
     const calendarData = await CalendarYear.findOne({ tenantid: uid, year });
@@ -26,26 +27,34 @@ export default class Calendar {
     res.status(200).json({ message: "Calendar data fetched successfully", data: calendarData });
   }
 
-  private async newCalendarDay(req: Request, res: Response) {
+  private async newCalendarDay(req: CustomRequest, res: Response) {
     console.log("Processing new calendar day");
 
     const { uid, year, month, day } = req.params;
-    let { time, type, amount, by, from } = req.body;
+    let { type, amount, from } = req.body;
 
-    // Convert "now" to a Date object if needed
-    if (time === "now") {
-      time = new Date();
+
+
+    // Validate required fields
+    if (!from || !type || !amount) {
+      return res.status(400).json({ message: "Missing required fields: by, from, type, amount" });
     }
 
-    if (!by) {
-      return res.status(400).json({ message: "Field 'by' is required" });
-    }
+    // Create a new active record based on the updated schema
+    const newActiveRecord = {
+      userId: req.user?.global.uid,
+      amount: Number(amount),
+      type: type,
+      description: from,
+      time: new Date(),
+      lastUpdated: new Date()
+    };
 
     // Look for an existing calendar document for the tenant and year
     let calendarYearDoc = await CalendarYear.findOne({ tenantid: uid, year });
 
     if (!calendarYearDoc) {
-      // Create a new document if one doesn't exist
+      // Create a new document if none exists
       calendarYearDoc = new CalendarYear({
         tenantid: uid,
         year,
@@ -53,40 +62,35 @@ export default class Calendar {
           month,
           days: [{
             day,
-            time,
-            type,
-            amount,
-            by,
-            from,
-          }],
-        }],
+            active: [newActiveRecord]
+          }]
+        }]
       });
     } else {
-      // Look for the month in the document
-      const monthIndex = calendarYearDoc.months.findIndex((m: any) => m.month === month);
-      if (monthIndex === -1) {
-        // Add new month with day
+      // Find the month document within the year
+      let monthDoc = calendarYearDoc.months.find((m: any) => m.month === month);
+      if (!monthDoc) {
+        // Add a new month with a new day entry if month does not exist
         calendarYearDoc.months.push({
           month,
           days: [{
             day,
-            time,
-            type,
-            amount,
-            by,
-            from,
-          }],
+            active: [newActiveRecord]
+          }]
         });
       } else {
-        // Month exists; append the new day
-        calendarYearDoc.months[monthIndex].days.push({
-          day,
-          time,
-          type,
-          amount,
-          by,
-          from,
-        });
+        // Check if the day document already exists within the month
+        let dayDoc = monthDoc.days.find((d: any) => d.day === day);
+        if (!dayDoc) {
+          // Add a new day document with the active record
+          monthDoc.days.push({
+            day,
+            active: [newActiveRecord]
+          });
+        } else {
+          // Day document exists; push the new active record into the active array
+          dayDoc.active.push(newActiveRecord);
+        }
       }
     }
 

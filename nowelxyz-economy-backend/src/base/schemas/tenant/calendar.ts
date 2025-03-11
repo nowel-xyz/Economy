@@ -20,13 +20,19 @@ export interface ICalendarYear extends Document {
   months: IMonth[];
 }
 
+
+const dayActive = new Schema({
+    userId: { type: String, required: true },
+    amount: { type: Number, required: true },
+    type: { type: String, required: true },
+    description: { type: String, required: true },
+    time: { type: Date, required: true },
+    lastUpdated: { type: Date, required: true },
+});
+
 const daySchema = new Schema({
   day: { type: String, required: true },
-  time: { type: Date, required: true, default: Date.now },
-  type: { type: String, required: true },
-  amount: { type: Number, required: true },
-  by: { type: String, required: true },
-  from: { type: String, required: true },
+  active: { type: [dayActive], required: true },
 });
 
 const monthSchema = new Schema({
