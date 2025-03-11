@@ -1,65 +1,55 @@
-import mongoose, { Document, Schema} from "mongoose";
+import mongoose, { Document, Schema } from "mongoose";
 
-export interface Idays extends Document {
-    day: string,
-    time: Date,
-    type: string,
-    amount: number,
-    by: string,
-    from: string,
+export interface IDay extends Document {
+  day: string;
+  time: Date;
+  type: string;
+  amount: number;
+  by: string;
+  from: string;
 }
 
-
-export interface IMonths extends Document {
-    month: string,
-    days: Idays[],
+export interface IMonth extends Document {
+  month: string;
+  days: IDay[];
 }
 
-
-export interface IYear extends Document {
-    year: string,
-    months: IMonths[],
+export interface ICalendarYear extends Document {
+  tenantid: string;
+  year: string;
+  months: IMonth[];
 }
 
+const daySchema = new Schema({
+  day: { type: String, required: true },
+  time: { type: Date, required: true, default: Date.now },
+  type: { type: String, required: true },
+  amount: { type: Number, required: true },
+  by: { type: String, required: true },
+  from: { type: String, required: true },
+});
 
-export interface ICalendar extends Document {
-    tenantid: string,
-    year: IYear[],
-}
+const monthSchema = new Schema({
+  month: { type: String, required: true },
+  days: [daySchema],
+});
 
-const calendarSchema = new Schema({
+const calendarYearSchema = new Schema(
+  {
     tenantid: { type: String, required: true },
-    year: [
-        {
-            year: { type: String, required: true },
-            months: [
-                {
-                    month: { type: String, required: true },
-                    days: [
-                        {
-                            day: { type: String, required: true },
-                            time: { type: Date, required: true, default: Date.now() },
-                            type: { type: String, required: true },
-                            amount: { type: Number, required: true },
-                            by: { type: String, required: true },
-                            from: { type: String, required: true },
-                        },
-                    ],
-                },
-            ],
-        },
-    ],
-},
-{ 
+    year: { type: String, required: true },
+    months: [monthSchema],
+  },
+  {
     timestamps: true,
     toJSON: {
-        transform: (_doc, ret) => {
-            delete ret._id;
-            delete ret.__v;
-            return ret;
-        },
+      transform: (_doc, ret) => {
+        delete ret._id;
+        delete ret.__v;
+        return ret;
+      },
     },
-    
-})
+  }
+);
 
-export default mongoose.models.calendar || mongoose.model<ICalendar>("calendar", calendarSchema)
+export default mongoose.models.CalendarYear || mongoose.model<ICalendarYear>("CalendarYear", calendarYearSchema);
