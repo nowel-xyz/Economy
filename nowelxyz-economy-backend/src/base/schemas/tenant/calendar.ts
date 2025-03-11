@@ -1,3 +1,4 @@
+import e from "express";
 import mongoose, { Document, Schema } from "mongoose";
 
 export interface IDay extends Document {
@@ -20,11 +21,24 @@ export interface ICalendarYear extends Document {
   months: IMonth[];
 }
 
+export enum incomeExpense {
+  add = "add",
+  remove = "remove",
+}
+
+export enum status  {
+  pending = "pending",
+  approved = "approved",
+  rejected = "rejected",
+  deleted = "deleted"
+} 
+
 
 const dayActive = new Schema({
     userId: { type: String, required: true },
     amount: { type: Number, required: true },
-    type: { type: String, required: true },
+    incomeExpense: { type: String, required: false, enum: incomeExpense },
+    status: { type: String, required: false, enum: status },
     description: { type: String, required: true },
     time: { type: Date, required: true },
     lastUpdated: { type: Date, required: true },

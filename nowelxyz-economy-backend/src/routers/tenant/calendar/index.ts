@@ -31,12 +31,12 @@ export default class Calendar {
     console.log("Processing new calendar day");
 
     const { uid, year, month, day } = req.params;
-    let { type, amount, from } = req.body;
+    let { status, amount, description, incomeExpense } = req.body;
 
 
 
     // Validate required fields
-    if (!from || !type || !amount) {
+    if (!description || !status || !amount || !incomeExpense) {
       return res.status(400).json({ message: "Missing required fields: by, from, type, amount" });
     }
 
@@ -44,8 +44,9 @@ export default class Calendar {
     const newActiveRecord = {
       userId: req.user?.global.uid,
       amount: Number(amount),
-      type: type,
-      description: from,
+      incomeExpense,
+      status,
+      description,
       time: new Date(),
       lastUpdated: new Date()
     };
