@@ -18,14 +18,41 @@ export default class Calendar {
   }
 
   private async getCalendar(req: CustomRequest, res: Response) {
-    const { uid, year } = req.params;
+    const { uid, year, month, day } = req.params;
+  
     // Find the calendar document for this tenant and year
     const calendarData = await CalendarYear.findOne({ tenantid: uid, year });
+  
     if (!calendarData) {
       return res.status(404).json({ message: "No calendar data found for this year" });
     }
-    res.status(200).json({ message: "Calendar data fetched successfully", data: calendarData });
+  
+    // If only year is provided, return the whole year data
+    if (!month) {
+      return res.status(200).json({ message: "Calendar year data fetched successfully", data: calendarData });
+    }
+  
+    // Find the month data
+    const monthData = calendarData.months.find((m: any) => m.month === month);
+    if (!monthData) {
+      return res.status(404).json({ message: "No calendar data found for this month" });
+    }
+  
+    // If only year and month are provided, return month data
+    if (!day) {
+      return res.status(200).json({ message: "Calendar month data fetched successfully", data: monthData });
+    }
+  
+    // Find the day data
+    const dayData = monthData.days.find((d: any) => d.day === day);
+    if (!dayData) {
+      return res.status(404).json({ message: "No calendar data found for this day" });
+    }
+  
+    // Return specific day data
+    return res.status(200).json({ message: "Calendar day data fetched successfully", data: dayData });
   }
+  
 
   private async newCalendarDay(req: CustomRequest, res: Response) {
     console.log("Processing new calendar day");

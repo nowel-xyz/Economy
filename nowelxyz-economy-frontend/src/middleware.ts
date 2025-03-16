@@ -48,7 +48,6 @@ export async function middleware(req: NextRequest) {
             }
 
             const data = await res.json();
-            console.log(data);
 
             // Set the tenant data in response headers
             const response = NextResponse.next();
