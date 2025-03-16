@@ -73,13 +73,13 @@ const TenantPage = ({ tenantData }: { tenantData: any }) => {
 
         setMonth(newMonth);
         setYear(newYear);
-        router.push(`/tenant/${tenantid}?year=${newYear}&month=${newMonth}`, undefined, { shallow: true });
+        router.push(`/tenants/${tenantid}?year=${newYear}&month=${newMonth}`, undefined, { shallow: true });
     };
 
     const changeYear = (offset: number) => {
         const newYear = year + offset;
         setYear(newYear);
-        router.push(`/tenant/${tenantid}?year=${newYear}&month=${month}`, undefined, { shallow: true });
+        router.push(`/tenants/${tenantid}?year=${newYear}&month=${month}`, undefined, { shallow: true });
     };
 
     const handleDayClick = (day: number) => {
