@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { BACKEND_API } from './utils/urls';
+import { BACKEND_API } from '../src/utils/urls';
 
 export async function middleware(req: NextRequest) {
     const excludedPaths = ['/login', '/register'];

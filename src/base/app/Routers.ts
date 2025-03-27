@@ -1,8 +1,8 @@
 import { Router, Express } from "express";
-import Auth from "../../routers/auth"; import authorize from "../utils/authorize";
-import Tenant from "../../routers/tenant";
+import Auth from "../../server/auth"; import authorize from "../utils/authorize";
+import Tenant from "../../server/tenant";
 import populateUser from "../utils/User/populateUser";
-import User from "../../routers/user";
+import User from "../../server/user";
 
 const routerApi = Router()
 

@@ -26,7 +26,7 @@ export default class EnvManager {
     }
 
     static checkDefiendEnvs(): void {
-        let i = [];
+        let i: string[] = [];
         for (const key in this.NeedTobeDefiend) {
             if (!process.env[key]) {
                 i.push(key);

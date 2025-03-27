@@ -4,7 +4,7 @@ import EnvManager from "./base/utils/EnvManager";
 config();
 
 new app({
-    port: 3001,
-    mongoooseURL: EnvManager.get("MONGOOSE_URL"),
+    port: 3000,
+    mongooseURL: EnvManager.get("MONGOOSE_URL"),
 }).init();
 
