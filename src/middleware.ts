@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { BACKEND_API } from '../src/utils/urls';
+import { BACKEND_API } from './base/utils/urls';
 
 export async function middleware(req: NextRequest) {
     const excludedPaths = ['/login', '/register'];
@@ -32,7 +32,7 @@ export async function middleware(req: NextRequest) {
         }
 
         try {
-            
+
             const res = await fetch(`${BACKEND_API}/tenant/${tenantid}`, {
                 method: 'GET',
                 headers: {

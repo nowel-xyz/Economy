@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 import axios from 'axios';
-import { BACKEND_API } from '@/utils/urls';
+import { BACKEND_API } from '@/base/utils/urls';
 
 export default function Register() {
   const [name, setName] = useState('');

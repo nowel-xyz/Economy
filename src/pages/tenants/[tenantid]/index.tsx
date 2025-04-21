@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { BACKEND_API } from "@/utils/urls";
+import { BACKEND_API } from "@/base/utils/urls";
 import { useRouter } from "next/router";
 import { GetServerSideProps } from "next";
 
@@ -35,7 +35,7 @@ const TenantPage = ({ tenantData }: { tenantData: any }) => {
                 const daysInMonth = new Date(year, month, 0).getDate();
                 const fullCalendar = Array.from({ length: daysInMonth }, (_, i) => {
                     const transactions = fetchedDays.find((d: { day: any }) => Number(d.day) === i + 1)?.active || [];
-                    
+
                     const balance = transactions.reduce((acc: number, tx: any) => {
                         return acc + (tx.incomeExpense === "add" ? tx.amount : -tx.amount);
                     }, 0);

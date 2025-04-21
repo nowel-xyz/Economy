@@ -1,5 +1,5 @@
-import IUser from '@/utils/types/IUser';
-import { BACKEND_API } from '@/utils/urls';
+import IUser from '@/base/utils/IUser';
+import { BACKEND_API } from '@/base/utils/urls';
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 export interface UserContextType {
@@ -17,13 +17,13 @@ export function UserProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
 
     async function fetchUser() {
-        const response = await fetch(`${BACKEND_API}/users/@me`, {
-            credentials: 'include'
-        });
+      const response = await fetch(`${BACKEND_API}/users/@me`, {
+        credentials: 'include'
+      });
 
-        const ResUser = await response.json();
-        setUser(ResUser.data);
-        setUserloading(false);
+      const ResUser = await response.json();
+      setUser(ResUser.data);
+      setUserloading(false);
     }
 
     fetchUser();

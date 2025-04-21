@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import axios from 'axios';
-import { BACKEND_API } from '@/utils/urls';
+import { BACKEND_API } from '@/base/utils/urls';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -11,31 +11,31 @@ export default function Login() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-  
+
     const body = { email, password };
-  
+
     try {
-        await axios.post(`${BACKEND_API}/auth/login`, body, {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          withCredentials: true,
-       });
-  
-        // Redirect and force a full page reload
-        const redirectUrl = router.query.redirect_uri
-          ? decodeURIComponent(router.query.redirect_uri as string)
-          : '/';
-        window.location.href = redirectUrl;
+      await axios.post(`${BACKEND_API}/auth/login`, body, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
+      });
+
+      // Redirect and force a full page reload
+      const redirectUrl = router.query.redirect_uri
+        ? decodeURIComponent(router.query.redirect_uri as string)
+        : '/';
+      window.location.href = redirectUrl;
     } catch (err: any) {
-        if (err.response?.data?.message) {
-          setError(err.response.data.message);
-        } else {
-          setError(err.message || 'An unknown error occurred');
-        }
+      if (err.response?.data?.message) {
+        setError(err.response.data.message);
+      } else {
+        setError(err.message || 'An unknown error occurred');
+      }
     }
   };
-  
+
 
   return (
     <div style={{ maxWidth: 400, margin: 'auto', padding: '1rem' }}>
